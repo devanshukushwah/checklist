@@ -10,9 +10,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.checklist.model.Task;
+import com.checklist.service.TaskService;
+
+import lombok.AllArgsConstructor;
 
 @Controller
+@AllArgsConstructor
 public class AppController {
+	
+	private TaskService taskService;
 
 	@GetMapping("/test")
 	@ResponseBody
@@ -22,9 +28,10 @@ public class AppController {
 	
 	@GetMapping("/")
 	public String getHome(Model md) {
-		List<Task> tsk = Arrays.asList(new Task("Task 1", false), 
-		new Task("Task 2", true), new Task("Task 3", false), new Task("Task 4", true));
-		md.addAttribute("taskList", tsk);
+
+		List<Task> homeTask = taskService.getHomeTask();
+		md.addAttribute("taskList", homeTask);	
+		
 		return "home";
 	}
 	

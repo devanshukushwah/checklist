@@ -18,40 +18,16 @@
 	<div class="ui container">
 		<h2 class="ui header">My List</h2>
 		<div class="ui list">
-			<div class="item">
-				<div class="ui checkbox">
-					<input type="checkbox" name="task1"> <label>Task 1:
-						Buy groceries</label>
-				</div>
-			</div>
-			<div class="item">
-				<div class="ui checkbox">
-					<input type="checkbox" name="task2"> <label>Task 2:
-						Finish project</label>
-				</div>
-			</div>
-			<div class="item">
-				<div class="ui checkbox">
-					<input type="checkbox" name="task3"> <label>Task 3:
-						Call mom</label>
-				</div>
-			</div>
-			<div class="item">
-				<div class="ui checkbox">
-					<input type="checkbox" name="task4"> <label>Task 4:
-						Exercise</label>
-				</div>
-			</div>
 			<c:forEach var="item" items="${taskList}">
 				<div class="item">
-					<form class="ui checkbox" action="./clickCheckbox" method="post">
+					<div class="ui checkbox" action="./clickCheckbox" method="post">
 						<input type="hidden" name="id" value="${item.id}" /> <input
 							type="checkbox" name="task3"
-							<c:if test="${item.status == false}">
+							<c:if test="${item.status == true}">
                 					checked
             				</c:if>>
 						<label>${item.title}</label>
-					</form>
+					</div>
 				</div>
 			</c:forEach>
 		</div>
