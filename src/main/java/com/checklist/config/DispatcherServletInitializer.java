@@ -13,8 +13,7 @@ public class DispatcherServletInitializer extends AbstractAnnotationConfigDispat
 	@Override
 	protected Class<?>[] getServletConfigClasses() {
 		// TODO Auto-generated method stub
-		Class[] config = {AppConfig.class};
-		return config;
+		return new Class[] {WebConfig.class};
 	}
 
 	@Override

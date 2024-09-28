@@ -7,7 +7,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 @Configuration
 @ComponentScan("com.checklist")
-public class AppConfig {
+public class WebConfig {
 	@Bean
 	public InternalResourceViewResolver getResolver() {
 		InternalResourceViewResolver obj = new InternalResourceViewResolver();
@@ -15,4 +15,5 @@ public class AppConfig {
 		obj.setSuffix(".jsp");
 		return obj;
 	}
+
 }
