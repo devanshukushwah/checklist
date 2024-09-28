@@ -21,4 +21,14 @@ public class TaskServiceImpl implements TaskService {
 		return taskDAO.getHomeTask();
 	}
 
+	@Override
+	public boolean updateStatus(int id, boolean status) {
+		return taskDAO.updateStatus(id, status);
+	}
+
+	@Override
+	public boolean addTask(Task task) {
+		return taskDAO.addTask(task);
+	}
+
 }

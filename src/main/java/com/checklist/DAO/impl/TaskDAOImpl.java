@@ -24,7 +24,7 @@ public class TaskDAOImpl implements TaskDAO {
 		try {
 			Connection conn = DBConnect.getConn();
 			
-			String sql = "SELECT * FROM TASK";
+			String sql = "SELECT * FROM TASK ORDER BY CREATED_DATE ASC";
 			PreparedStatement ps = conn.prepareStatement(sql);
 			ResultSet result = ps.executeQuery();
 			
@@ -32,12 +32,48 @@ public class TaskDAOImpl implements TaskDAO {
 				allTask.add(new Task(result.getInt("id"), result.getString("title"), result.getBoolean("status")));
 			}
 			
-		} catch (Exception ex) {
-			
+		} catch (Exception ex) {	
 			System.out.println(ex.getMessage());
 		}
-		// TODO Auto-generated method stub
 		return allTask;
+	}
+
+	@Override
+	public boolean updateStatus(int id, boolean status) {
+		try {
+			Connection conn = DBConnect.getConn();
+			
+			String sql = "UPDATE TASK SET STATUS = ?, CHANGED_DATE = CURRENT_TIMESTAMP WHERE ID = ?";
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setBoolean(1, status);
+			ps.setInt(2, id);
+			
+			int rows = ps.executeUpdate();
+			
+			return rows > 0;
+			
+		} catch (Exception ex) {	
+			System.out.println(ex.getMessage());
+		}
+		return false;
+	}
+
+	@Override
+	public boolean addTask(Task task) {
+		try {
+			Connection conn = DBConnect.getConn();
+			
+			String sql = "INSERT INTO TASK(TITLE, STATUS) VALUES (?, FALSE)";
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setString(1, task.getTitle());
+			int rows = ps.executeUpdate();
+			
+			return rows > 0;
+			
+		} catch (Exception ex) {	
+			System.out.println(ex.getMessage());
+		}
+		return false;
 	}
 	
 }
