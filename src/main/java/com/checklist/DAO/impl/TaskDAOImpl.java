@@ -19,13 +19,14 @@ import lombok.AllArgsConstructor;
 public class TaskDAOImpl implements TaskDAO {
 
 	@Override
-	public List<Task> getHomeTask() {
+	public List<Task> getHomeTask(int userId) {
 		List<Task> allTask = new ArrayList<>();
 		try {
 			Connection conn = DBConnect.getConn();
 			
-			String sql = "SELECT * FROM TASK ORDER BY CREATED_DATE ASC";
+			String sql = "SELECT * FROM TASK WHERE CREATED_BY = ? ORDER BY CREATED_DATE ASC";
 			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setInt(1, userId);
 			ResultSet result = ps.executeQuery();
 			
 			while(result.next()) {
@@ -59,13 +60,15 @@ public class TaskDAOImpl implements TaskDAO {
 	}
 
 	@Override
-	public boolean addTask(Task task) {
+	public boolean addTask(int createdBy, Task task) {
 		try {
 			Connection conn = DBConnect.getConn();
 			
-			String sql = "INSERT INTO TASK(TITLE, STATUS) VALUES (?, FALSE)";
+			String sql = "INSERT INTO TASK(TITLE, STATUS, CREATED_BY) VALUES (?, ?, ?)";
 			PreparedStatement ps = conn.prepareStatement(sql);
 			ps.setString(1, task.getTitle());
+			ps.setInt(3, createdBy);
+			ps.setBoolean(2, task.isStatus());
 			int rows = ps.executeUpdate();
 			
 			return rows > 0;

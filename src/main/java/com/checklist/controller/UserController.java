@@ -1,9 +1,12 @@
 package com.checklist.controller;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.checklist.model.User;
 import com.checklist.service.UserService;
@@ -22,10 +25,11 @@ public class UserController {
 	}
 	
 	@PostMapping("/login")
-	public String validateUser(@ModelAttribute User user) {
+	public String validateUser(@ModelAttribute User user, HttpSession session) {
 		User loginUser = userService.getUser(user.getEmail(), user.getPassword());
 		if(loginUser != null) {
-			return "home";
+			session.setAttribute("user", loginUser);
+			return "redirect:home";
 		}
 		return "login";
 	}
@@ -43,4 +47,10 @@ public class UserController {
 		}
 		return "register";
 	}
+	
+    @RequestMapping("/logout")
+    public String logout(HttpSession session) {
+        session.invalidate();  // Invalidate session on logout
+        return "redirect:/login";
+    }
 }

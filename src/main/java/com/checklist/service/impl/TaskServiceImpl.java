@@ -17,8 +17,8 @@ public class TaskServiceImpl implements TaskService {
 	private TaskDAO taskDAO;
 
 	@Override
-	public List<Task> getHomeTask() {
-		return taskDAO.getHomeTask();
+	public List<Task> getHomeTask(int userId) {
+		return taskDAO.getHomeTask(userId);
 	}
 
 	@Override
@@ -27,8 +27,8 @@ public class TaskServiceImpl implements TaskService {
 	}
 
 	@Override
-	public boolean addTask(Task task) {
-		return taskDAO.addTask(task);
+	public boolean addTask(int createdBy, Task task) {
+		return taskDAO.addTask(createdBy, task);
 	}
 
 }

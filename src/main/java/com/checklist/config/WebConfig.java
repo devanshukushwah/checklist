@@ -1,13 +1,25 @@
 package com.checklist.config;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
+
+import com.checklist.interceptor.AuthInterceptor;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 
 @Configuration
+@EnableWebMvc
 @ComponentScan("com.checklist")
-public class WebConfig {
+public class WebConfig implements WebMvcConfigurer  {
+	
+    @Autowired
+    private AuthInterceptor authInterceptor;
+	
 	@Bean
 	public InternalResourceViewResolver getResolver() {
 		InternalResourceViewResolver obj = new InternalResourceViewResolver();
@@ -15,5 +27,12 @@ public class WebConfig {
 		obj.setSuffix(".jsp");
 		return obj;
 	}
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(authInterceptor)
+                .addPathPatterns("/**")  // Intercept all paths
+                .excludePathPatterns("/login", "/register", "/resources/**");  // Exclude login, register, and static resources
+    }
 
 }

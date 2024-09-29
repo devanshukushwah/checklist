@@ -2,6 +2,8 @@ package com.checklist.controller;
 
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.checklist.model.Task;
+import com.checklist.model.User;
 import com.checklist.service.TaskService;
 
 import lombok.AllArgsConstructor;
@@ -32,11 +35,10 @@ public class AppController {
 	}
 
 	@GetMapping("/home")
-	public String getHome(Model md) {
-
-		List<Task> homeTask = taskService.getHomeTask();
+	public String getHome(Model md, HttpSession session) {
+		User user = (User)session.getAttribute("user");
+		List<Task> homeTask = taskService.getHomeTask(user.getId());
 		md.addAttribute("taskList", homeTask);
-
 		return "home";
 	}
 
@@ -52,8 +54,9 @@ public class AppController {
 	}
 
 	@PostMapping("/add")
-	public String addTask(@ModelAttribute Task task) {
-		boolean res = taskService.addTask(task);
+	public String addTask(@ModelAttribute Task task, HttpSession session) {
+		User user = (User)session.getAttribute("user");
+		boolean res = taskService.addTask(user.getId(), task);
 		
 		if (res) {
 			return "redirect:home";	
