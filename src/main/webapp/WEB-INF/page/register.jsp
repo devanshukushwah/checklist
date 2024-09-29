@@ -27,11 +27,11 @@
 	<div class="register-container">
         <div class="ui raised segment register-form">
             <h2 class="ui header">Register</h2>
-            <form class="ui form" action="registerServlet" method="post">
+            <form class="ui form" action="./register" method="post">
                 <!-- Full Name Field -->
                 <div class="field">
                     <label for="fullname">Full Name</label>
-                    <input type="text" name="fullname" id="fullname" placeholder="Enter your full name" required>
+                    <input type="text" name="fullName" id="fullname" placeholder="Enter your full name" required>
                 </div>
 
                 <!-- Email Field -->
@@ -49,7 +49,7 @@
                 <!-- Confirm Password Field -->
                 <div class="field">
                     <label for="confirm_password">Confirm Password</label>
-                    <input type="password" name="confirm_password" id="confirm_password" placeholder="Confirm your password" required>
+                    <input type="password" name="confirmPassword" id="confirm_password" placeholder="Confirm your password" required>
                 </div>
 
                 <!-- Submit Button -->

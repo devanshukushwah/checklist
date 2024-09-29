@@ -27,11 +27,11 @@
 	<div class="login-container">
         <div class="ui raised segment login-form">
             <h2 class="ui header">Login</h2>
-            <form class="ui form" action="loginServlet" method="post">
+            <form class="ui form" action="./login" method="post">
                 <!-- Username Field -->
                 <div class="field">
-                    <label for="username">Username</label>
-                    <input type="text" name="username" id="username" placeholder="Enter your username" required>
+                    <label for="email">Email</label>
+                    <input type="text" name="email" id="email" placeholder="Enter your email" required>
                 </div>
 
                 <!-- Password Field -->
