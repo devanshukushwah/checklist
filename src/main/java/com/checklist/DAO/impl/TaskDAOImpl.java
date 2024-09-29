@@ -24,7 +24,7 @@ public class TaskDAOImpl implements TaskDAO {
 		try {
 			Connection conn = DBConnect.getConn();
 			
-			String sql = "SELECT * FROM TASK WHERE CREATED_BY = ? ORDER BY CREATED_DATE ASC";
+			String sql = "SELECT * FROM TASK WHERE CREATED_BY = ? AND created_date >= CURRENT_DATE AND created_date < CURRENT_DATE + INTERVAL '1 day' ORDER BY CREATED_DATE ASC";
 			PreparedStatement ps = conn.prepareStatement(sql);
 			ps.setInt(1, userId);
 			ResultSet result = ps.executeQuery();
