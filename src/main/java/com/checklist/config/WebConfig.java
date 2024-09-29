@@ -1,6 +1,8 @@
 package com.checklist.config;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -33,6 +35,13 @@ public class WebConfig implements WebMvcConfigurer  {
         registry.addInterceptor(authInterceptor)
                 .addPathPatterns("/**")  // Intercept all paths
                 .excludePathPatterns("/login", "/register", "/resources/**");  // Exclude login, register, and static resources
+    }
+    
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertyConfig() {
+        PropertySourcesPlaceholderConfigurer configurer = new PropertySourcesPlaceholderConfigurer();
+        configurer.setLocation(new ClassPathResource("application.properties"));
+        return configurer;
     }
 
 }

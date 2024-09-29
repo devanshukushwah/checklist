@@ -17,12 +17,14 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 @Component
 public class TaskDAOImpl implements TaskDAO {
+	
+	private DBConnect dbConnect;
 
 	@Override
 	public List<Task> getHomeTask(int userId) {
 		List<Task> allTask = new ArrayList<>();
 		try {
-			Connection conn = DBConnect.getConn();
+			Connection conn = dbConnect.getConn();
 			
 			String sql = "SELECT * FROM TASK WHERE CREATED_BY = ? AND created_date >= CURRENT_DATE AND created_date < CURRENT_DATE + INTERVAL '1 day' ORDER BY CREATED_DATE ASC";
 			PreparedStatement ps = conn.prepareStatement(sql);
@@ -42,7 +44,7 @@ public class TaskDAOImpl implements TaskDAO {
 	@Override
 	public boolean updateStatus(int id, boolean status) {
 		try {
-			Connection conn = DBConnect.getConn();
+			Connection conn = dbConnect.getConn();
 			
 			String sql = "UPDATE TASK SET STATUS = ?, CHANGED_DATE = CURRENT_TIMESTAMP WHERE ID = ?";
 			PreparedStatement ps = conn.prepareStatement(sql);
@@ -62,7 +64,7 @@ public class TaskDAOImpl implements TaskDAO {
 	@Override
 	public boolean addTask(int createdBy, Task task) {
 		try {
-			Connection conn = DBConnect.getConn();
+			Connection conn = dbConnect.getConn();
 			
 			String sql = "INSERT INTO TASK(TITLE, STATUS, CREATED_BY) VALUES (?, ?, ?)";
 			PreparedStatement ps = conn.prepareStatement(sql);

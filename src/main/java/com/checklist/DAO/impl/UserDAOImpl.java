@@ -17,11 +17,13 @@ import lombok.AllArgsConstructor;
 @Component
 public class UserDAOImpl implements UserDAO {
 
+	private DBConnect dbConnect;
+	
 	@Override
 	public int create(User user) {
 		
 		try {
-			Connection conn = DBConnect.getConn();
+			Connection conn = dbConnect.getConn();
 			
 			String sql = "INSERT INTO \"USER\"(FULL_NAME, EMAIL, PASSWORD) VALUES (?,?,?)";
 			PreparedStatement ps = conn.prepareStatement(sql);
@@ -40,7 +42,7 @@ public class UserDAOImpl implements UserDAO {
 	@Override
 	public User getUser(String email, String password) {
 		try {
-			Connection conn = DBConnect.getConn();
+			Connection conn = dbConnect.getConn();
 			
 			String sql = "SELECT * FROM \"USER\" WHERE EMAIL = ? AND PASSWORD = ?";
 			PreparedStatement ps = conn.prepareStatement(sql);
