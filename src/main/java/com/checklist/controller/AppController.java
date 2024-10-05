@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.checklist.model.Task;
+import com.checklist.model.TaskSearchFilter;
 import com.checklist.model.User;
 import com.checklist.service.TaskService;
 
@@ -34,12 +35,21 @@ public class AppController {
 		return "<h2>App Started....</h2>";
 	}
 
-	@GetMapping("/home")
+	@GetMapping(value = {"/", "/home"})
 	public String getHome(Model md, HttpSession session) {
 		User user = (User)session.getAttribute("user");
 		List<Task> homeTask = taskService.getHomeTask(user.getId());
 		md.addAttribute("taskList", homeTask);
 		return "home";
+	}
+	
+	@GetMapping("/history")
+	public String getHistory(Model md, HttpSession session) {
+		User user = (User) session.getAttribute("user");
+		List<Task> taskList = taskService.getTask(new TaskSearchFilter(), user.getId());
+//		System.out.println(taskList);
+		md.addAttribute("taskList", taskList);
+		return "history";
 	}
 
 	@PostMapping("/updateStatus")

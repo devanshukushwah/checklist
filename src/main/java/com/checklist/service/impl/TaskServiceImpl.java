@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.checklist.DAO.TaskDAO;
 import com.checklist.model.Task;
+import com.checklist.model.TaskSearchFilter;
 import com.checklist.service.TaskService;
 
 import lombok.AllArgsConstructor;
@@ -30,5 +31,12 @@ public class TaskServiceImpl implements TaskService {
 	public boolean addTask(int createdBy, Task task) {
 		return taskDAO.addTask(createdBy, task);
 	}
+	
+	@Override
+	public List<Task> getTask(TaskSearchFilter taskSearchFilter, int userId) {
+		return taskDAO.getTask(taskSearchFilter, userId);
+	}
+	
+	
 
 }

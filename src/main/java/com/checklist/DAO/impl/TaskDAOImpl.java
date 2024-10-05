@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import com.checklist.DAO.TaskDAO;
 import com.checklist.model.Task;
+import com.checklist.model.TaskSearchFilter;
 import com.checklist.database.DBConnect;
 
 import lombok.AllArgsConstructor;
@@ -31,8 +32,13 @@ public class TaskDAOImpl implements TaskDAO {
 			ps.setInt(1, userId);
 			ResultSet result = ps.executeQuery();
 			
-			while(result.next()) {
-				allTask.add(new Task(result.getInt("id"), result.getString("title"), result.getBoolean("status")));
+			while (result.next()) {
+				Task task = Task.builder()
+						.id(result.getInt("id"))
+						.title(result.getString("title"))
+						.status(result.getBoolean("status"))
+						.build();
+				allTask.add(task);
 			}
 			
 		} catch (Exception ex) {	
@@ -79,6 +85,34 @@ public class TaskDAOImpl implements TaskDAO {
 			System.out.println(ex.getMessage());
 		}
 		return false;
+	}
+
+	@Override
+	public List<Task> getTask(TaskSearchFilter taskSearchFilter, int userId) {
+		List<Task> allTask = new ArrayList<>();
+		try {
+			Connection conn = dbConnect.getConn();
+			
+			String sql = "SELECT * FROM TASK WHERE CREATED_BY = ? ORDER BY CREATED_DATE ASC";
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setInt(1, userId);
+			ResultSet result = ps.executeQuery();
+			
+			while (result.next()) {
+				Task task = Task.builder()
+						.id(result.getInt("id"))
+						.title(result.getString("title"))
+						.status(result.getBoolean("status"))
+						.createdDate(result.getTimestamp("created_date"))
+						.changedDate(result.getTimestamp("changed_date"))
+						.build();
+				allTask.add(task);
+			}
+			
+		} catch (Exception ex) {	
+			System.out.println(ex.getMessage());
+		}
+		return allTask;
 	}
 	
 }
