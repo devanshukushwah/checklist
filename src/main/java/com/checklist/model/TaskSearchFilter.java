@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class TaskSearchFilter {
-	private Date createdDate;
+	private Date createdFrom;
+	private Date createdTo;
 	private Boolean status;
 }

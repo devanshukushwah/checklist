@@ -1,25 +1,30 @@
 package com.checklist.controller;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 import com.checklist.model.Task;
 import com.checklist.model.TaskSearchFilter;
 import com.checklist.model.User;
 import com.checklist.service.TaskService;
+import com.checklist.util.DateUtil;
 
 import lombok.AllArgsConstructor;
 
@@ -43,13 +48,26 @@ public class AppController {
 		return "home";
 	}
 	
-	@GetMapping("/history")
-	public String getHistory(Model md, HttpSession session) {
+	@GetMapping("/detail/{date}")
+	public String getHistory(Model md, HttpSession session, @PathVariable("date") String date) {
 		User user = (User) session.getAttribute("user");
-		List<Task> taskList = taskService.getTask(new TaskSearchFilter(), user.getId());
-//		System.out.println(taskList);
+
+		// Define the expected date format
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+
+		TaskSearchFilter tsf = new TaskSearchFilter();
+
+		try {
+			Date parsedDate = formatter.parse(date);
+			tsf.setCreatedFrom(parsedDate);
+			tsf.setCreatedTo(DateUtil.addDay(parsedDate, 1));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+
+		List<Task> taskList = taskService.getTask(tsf, user.getId());
 		md.addAttribute("taskList", taskList);
-		return "history";
+		return "task-detail";
 	}
 
 	@PostMapping("/updateStatus")

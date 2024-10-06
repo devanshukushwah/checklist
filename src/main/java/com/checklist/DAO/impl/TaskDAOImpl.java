@@ -1,6 +1,7 @@
 package com.checklist.DAO.impl;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -88,14 +89,36 @@ public class TaskDAOImpl implements TaskDAO {
 	}
 
 	@Override
-	public List<Task> getTask(TaskSearchFilter taskSearchFilter, int userId) {
+	public List<Task> getTask(TaskSearchFilter tsf, int userId) {
 		List<Task> allTask = new ArrayList<>();
 		try {
 			Connection conn = dbConnect.getConn();
 			
-			String sql = "SELECT * FROM TASK WHERE CREATED_BY = ? ORDER BY CREATED_DATE ASC";
-			PreparedStatement ps = conn.prepareStatement(sql);
+			StringBuilder sql = new StringBuilder("SELECT * FROM TASK WHERE CREATED_BY = ?");
+			
+			if(tsf.getCreatedFrom() != null) {
+				sql.append(" AND CREATED_DATE >= ?");
+			}
+			
+			if(tsf.getCreatedTo() != null) {
+				sql.append(" AND CREATED_DATE < ?");
+			}
+			
+			sql.append(" ORDER BY CREATED_DATE ASC");
+		
+			PreparedStatement ps = conn.prepareStatement(sql.toString());
 			ps.setInt(1, userId);
+			
+			int psIdx = 2;
+			
+			if(tsf.getCreatedFrom() != null) {
+				ps.setDate(psIdx++, new java.sql.Date(tsf.getCreatedFrom().getTime()));
+			}
+			
+			if(tsf.getCreatedTo() != null) {
+				ps.setDate(psIdx++, new java.sql.Date(tsf.getCreatedTo().getTime()));
+			}
+			
 			ResultSet result = ps.executeQuery();
 			
 			while (result.next()) {
@@ -110,7 +133,7 @@ public class TaskDAOImpl implements TaskDAO {
 			}
 			
 		} catch (Exception ex) {	
-			System.out.println(ex.getMessage());
+			ex.printStackTrace();
 		}
 		return allTask;
 	}

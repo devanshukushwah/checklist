@@ -7,13 +7,13 @@
 <head>
 <meta charset="UTF-8">
 <jsp:include page="../common/commonHead.jsp"></jsp:include>
-<title>History</title>
+<title>Task Detail</title>
 </head>
 <body>
 	<jsp:include page="../all-components/header.jsp"></jsp:include>
 
 	<div class="ui container" style="margin-top: '50px'">
-		<h2 class="ui header">Task History</h2>
+		<h2 class="ui header">Task Detail</h2>
 
 		<!-- Example Semantic UI Table -->
 		<table class="ui celled table">
