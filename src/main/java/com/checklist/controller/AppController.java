@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.checklist.model.Task;
+import com.checklist.model.TaskHistory;
 import com.checklist.model.TaskSearchFilter;
 import com.checklist.model.User;
 import com.checklist.service.TaskService;
@@ -91,5 +92,13 @@ public class AppController {
 		}
 		
 		return "redirect:home";
+	}
+	
+	@GetMapping("/history")
+	public String getHistory(Model md, HttpSession session) {
+		User user = (User)session.getAttribute("user");
+		List<TaskHistory> th = taskService.getTaskHistory(user.getId());
+		md.addAttribute("taskHistory", th);
+		return "history";
 	}
 }

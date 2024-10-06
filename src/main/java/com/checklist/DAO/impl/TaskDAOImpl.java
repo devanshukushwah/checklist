@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import com.checklist.DAO.TaskDAO;
 import com.checklist.model.Task;
+import com.checklist.model.TaskHistory;
 import com.checklist.model.TaskSearchFilter;
 import com.checklist.database.DBConnect;
 
@@ -136,6 +137,32 @@ public class TaskDAOImpl implements TaskDAO {
 			ex.printStackTrace();
 		}
 		return allTask;
+	}
+
+	@Override
+	public List<TaskHistory> getTaskHistory(int userId) {
+		List<TaskHistory> th = new ArrayList<>();
+		try {
+			Connection conn = dbConnect.getConn();
+
+			String sql = "SELECT * FROM TASK_HISTORY_VIEW WHERE CREATED_BY = ? ORDER BY CREATED_DATE DESC";
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setInt(1, userId);
+			ResultSet result = ps.executeQuery();
+
+			while (result.next()) {
+				th.add(TaskHistory.builder()
+						.createdDate(result.getDate("created_date"))
+						.completed(result.getInt("completed"))
+						.totalRecords(result.getInt("total_records"))
+						.build());
+
+			}
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return th;
 	}
 	
 }
