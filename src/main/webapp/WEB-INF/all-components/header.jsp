@@ -11,7 +11,8 @@
 	</div>
 
 	<!-- Navigation Links -->
-	<a href="./" class="item">Home</a> <a href="history" class="item">History</a>
+	<a href="/home" class="item">Home</a> 
+	<a href="/history" class="item">History</a>
 	<!-- 
         <a href="contact.jsp" class="item">Contact</a>
          -->
