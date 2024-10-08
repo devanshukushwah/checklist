@@ -1,3 +1,6 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8" isELIgnored="false"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <html>
 <head>
 	<jsp:include page="../common/commonHead.jsp"></jsp:include>
@@ -40,7 +43,11 @@
                     <input type="password" name="password" id="password" placeholder="Enter your password" required>
                 </div>
 
-                <!-- Submit Button -->
+				<c:if test="${not empty errorMessage}">
+					<div class="ui mini red message">${errorMessage}</div>
+				</c:if>
+
+				<!-- Submit Button -->
                 <button class="ui primary button" type="submit">Login</button>
 
                 <!-- Optional: Link to Registration Page -->

@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 
 import com.checklist.DAO.UserDAO;
 import com.checklist.database.DBConnect;
+import com.checklist.exception.DatabaseError;
+import com.checklist.exception.UserNotFound;
 import com.checklist.model.Task;
 import com.checklist.model.User;
 
@@ -20,7 +22,7 @@ public class UserDAOImpl implements UserDAO {
 	private DBConnect dbConnect;
 	
 	@Override
-	public int create(User user) {
+	public int create(User user) throws DatabaseError {
 		
 		try {
 			Connection conn = dbConnect.getConn();
@@ -33,14 +35,12 @@ public class UserDAOImpl implements UserDAO {
 			int rows = ps.executeUpdate();
 			return rows;
 		} catch (Exception ex) {	
-			ex.printStackTrace();
+			throw new DatabaseError();
 		}
-		
-		return -1;
 	}
 
 	@Override
-	public User getUser(String email, String password) {
+	public User getUser(String email, String password) throws DatabaseError {
 		try {
 			Connection conn = dbConnect.getConn();
 			
@@ -57,10 +57,29 @@ public class UserDAOImpl implements UserDAO {
 				return user;
 			}
 		} catch (Exception ex) {	
-			ex.printStackTrace();
+			throw new DatabaseError();
 		}
 		
 		return null;
+	}
+
+	@Override
+	public boolean userExists(String email) throws DatabaseError {
+		try {
+			Connection conn = dbConnect.getConn();
+			
+			String sql = "SELECT EXISTS (SELECT 1 FROM \"USER\" WHERE EMAIL = ?)";
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setString(1, email);
+			ResultSet rs = ps.executeQuery();
+			while (rs.next()) {
+				return rs.getBoolean(1);
+			}
+		} catch (Exception ex) {	
+			throw new DatabaseError();
+		}
+		
+		return false;
 	}
 
 }

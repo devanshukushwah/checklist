@@ -1,3 +1,6 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8" isELIgnored="false"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <html>
 <head>
 	<jsp:include page="../common/commonHead.jsp"></jsp:include>
@@ -51,6 +54,10 @@
                     <label for="confirm_password">Confirm Password</label>
                     <input type="password" name="confirmPassword" id="confirm_password" placeholder="Confirm your password" required>
                 </div>
+
+				<c:if test="${not empty errorMessage}">
+					<div class="ui mini red message">${errorMessage}</div>
+				</c:if>
 
                 <!-- Submit Button -->
                 <button class="ui primary button" type="submit">Register</button>
