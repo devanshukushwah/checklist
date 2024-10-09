@@ -1,30 +1,36 @@
 package com.checklist.model;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.util.Date;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+/**
+ * Represents a task in the checklist application.
+ * This class holds the details of a task including its identifier, title,
+ * status, and timestamps for creation and modification.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class Task {
-	private int id;
-	private String title;
-	private boolean status;
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-	private Date createdDate;
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-	private Date changedDate;
+    private int id;               // Unique identifier for the task
+    private String title;         // Title of the task
+    private boolean status;       // Status of the task (e.g., completed or failed)
+    private Date createdDate;     // Date the task was created
+    private Date changedDate;     // Date the task was last modified
 
-	public Task(String title, boolean status) {
-		this.title = title;
-		this.status = status;
-	}
+    /**
+     * Constructs a new Task with the specified title and status.
+     *
+     * @param title the title of the task
+     * @param status the status of the task
+     */
+    public Task(String title, boolean status) {
+        this.title = title;
+        this.status = status;
+    }
 }
