@@ -1,17 +1,12 @@
 package com.checklist.controller;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAccessor;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,76 +24,114 @@ import com.checklist.util.DateUtil;
 
 import lombok.AllArgsConstructor;
 
+/**
+ * This controller handles requests for managing tasks in the checklist application.
+ * It provides functionalities for displaying tasks, task history, adding tasks, 
+ * and updating task status.
+ */
 @Controller
 @AllArgsConstructor
 public class AppController {
 
-	private TaskService taskService;
+    private TaskService taskService;
 
-	@GetMapping("/test")
-	@ResponseBody
-	public String test() {
-		return "<h2>App Started....</h2>";
-	}
+    /**
+     * A simple test endpoint to verify if the application is running.
+     *
+     * @return a string confirming the app has started
+     */
+    @GetMapping("/test")
+    @ResponseBody
+    public String test() {
+        return "<h2>App Started....</h2>";
+    }
 
-	@GetMapping(value = {"/", "/home"})
-	public String getHome(Model md, HttpSession session) {
-		User user = (User)session.getAttribute("user");
-		List<Task> homeTask = taskService.getHomeTask(user.getId());
-		md.addAttribute("taskList", homeTask);
-		return "home";
-	}
-	
-	@GetMapping("/detail/{date}")
-	public String getHistory(Model md, HttpSession session, @PathVariable("date") String date) {
-		User user = (User) session.getAttribute("user");
+    /**
+     * Handles the request to display the home page, which shows a list of tasks 
+     * for the logged-in user.
+     *
+     * @param md the model to pass attributes to the view
+     * @param session the current HTTP session to retrieve the logged-in user
+     * @return the name of the JSP page to render the home view
+     */
+    @GetMapping(value = {"/", "/home"})
+    public String getHome(Model md, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        List<Task> homeTask = taskService.getHomeTask(user.getId());
+        md.addAttribute("taskList", homeTask);
+        return "home";
+    }
 
-		// Define the expected date format
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+    /**
+     * Handles the request to display the task history for a specific date.
+     * It parses the date from the URL, fetches tasks created on that date, 
+     * and adds them to the model.
+     *
+     * @param md the model to pass attributes to the view
+     * @param session the current HTTP session to retrieve the logged-in user
+     * @param date the date string (in yyyy-MM-dd format) from the URL
+     * @return the name of the JSP page to render the task details view
+     */
+    @GetMapping("/detail/{date}")
+    public String getHistory(Model md, HttpSession session, @PathVariable("date") String date) {
+        User user = (User) session.getAttribute("user");
 
-		TaskSearchFilter tsf = new TaskSearchFilter();
+        // Define the expected date format
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
-		try {
-			Date parsedDate = formatter.parse(date);
-			tsf.setCreatedFrom(parsedDate);
-			tsf.setCreatedTo(DateUtil.addDay(parsedDate, 1));
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
+        TaskSearchFilter tsf = new TaskSearchFilter();
 
-		List<Task> taskList = taskService.getTask(tsf, user.getId());
-		md.addAttribute("taskList", taskList);
-		return "task-detail";
-	}
+        try {
+            Date parsedDate = formatter.parse(date);
+            tsf.setCreatedFrom(parsedDate);
+            tsf.setCreatedTo(DateUtil.addDay(parsedDate, 1));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
-	@PostMapping("/updateStatus")
-	public String updateStatus(@ModelAttribute Task task) {
-		boolean res = taskService.updateStatus(task.getId(), true);
-		if (res) {
-			return "redirect:home";
-		}
-		
-		return "redirect:home";
-		
-	}
+        List<Task> taskList = taskService.getTask(tsf, user.getId());
+        md.addAttribute("taskList", taskList);
+        return "task-detail";
+    }
 
-	@PostMapping("/add")
-	public String addTask(@ModelAttribute Task task, HttpSession session) {
-		User user = (User)session.getAttribute("user");
-		boolean res = taskService.addTask(user.getId(), task);
-		
-		if (res) {
-			return "redirect:home";	
-		}
-		
-		return "redirect:home";
-	}
-	
-	@GetMapping("/history")
-	public String getHistory(Model md, HttpSession session) {
-		User user = (User)session.getAttribute("user");
-		List<TaskHistory> th = taskService.getTaskHistory(user.getId());
-		md.addAttribute("taskHistory", th);
-		return "history";
-	}
+    /**
+     * Updates the status of a task and redirects the user to the home page.
+     *
+     * @param task the task object whose status needs to be updated
+     * @return a redirect to the home page
+     */
+    @PostMapping("/updateStatus")
+    public String updateStatus(@ModelAttribute Task task) {
+        boolean res = taskService.updateStatus(task.getId(), true);
+        return "redirect:home";
+    }
+
+    /**
+     * Adds a new task to the user's task list and redirects to the home page.
+     *
+     * @param task the task to be added
+     * @param session the current HTTP session to retrieve the logged-in user
+     * @return a redirect to the home page
+     */
+    @PostMapping("/add")
+    public String addTask(@ModelAttribute Task task, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        boolean res = taskService.addTask(user.getId(), task);
+        return "redirect:home";
+    }
+
+    /**
+     * Displays the task history for the logged-in user.
+     *
+     * @param md the model to pass attributes to the view
+     * @param session the current HTTP session to retrieve the logged-in user
+     * @return the name of the JSP page to render the task history view
+     */
+    @GetMapping("/history")
+    public String getHistory(Model md, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        List<TaskHistory> th = taskService.getTaskHistory(user.getId());
+        md.addAttribute("taskHistory", th);
+        return "history";
+    }
 }
