@@ -28,7 +28,7 @@
 					<c:forEach var="thistory" items="${taskHistory}">
 						<tr>
 							<td><a href="./detail/${thistory.createdDate}">${thistory.createdDate}</a></td>
-							<td>${thistory.completed} / ${thistory.totalRecords}</td>
+							<td>${thistory.completed}/ ${thistory.totalTasks}</td>
 						</tr>
 					</c:forEach>
 				</c:if>
@@ -39,6 +39,38 @@
 				</c:if>
 			</tbody>
 		</table>
+
+		<%
+		    // Values for page number, total pages, and page size (could come from request or backend logic)
+		    int pageNo = Integer.parseInt(request.getParameter("pageNo") != null ? request.getParameter("pageNo") : "1");
+		    int totalPages = (int) request.getAttribute("totalPages"); // example total pages
+		    int pageSize = (int) request.getAttribute("pageSize"); // example page size
+
+		    // Determine the range of page numbers to display
+		    int startPage = Math.max(2, pageNo - 2); // Display 2 previous pages
+		    int endPage = Math.min(totalPages - 1, pageNo + 2); // Display 2 next pages
+			%>
+
+		<c:if test="${totalPages > 1}">
+			<div class="ui pagination menu">
+				<!-- Previous Button -->
+				<a class="icon item" href="?pageNo=1&pageSize=<%=pageSize%>"> 1
+				</a>
+
+				<!-- Page Numbers -->
+				<% for (int i = startPage; i <= endPage; i++) { %>
+				<a class="item <%= (i == pageNo) ? "active" : "" %>"
+					href="?pageNo=<%= i %>&pageSize=<%=pageSize%>"><%= i %></a>
+				<% } %>
+
+				<!-- Next Button -->
+				<a class="icon item"
+					href="?pageNo=<%=totalPages%>&pageSize=<%=pageSize%>"><%=totalPages %>
+				</a>
+
+			</div>
+		</c:if>
 	</div>
+
 </body>
 </html>

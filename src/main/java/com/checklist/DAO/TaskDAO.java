@@ -2,6 +2,8 @@ package com.checklist.DAO;
 
 import java.util.List;
 
+import com.checklist.model.PageRequest;
+import com.checklist.model.PageResponse;
 import com.checklist.model.Task;
 import com.checklist.model.TaskHistory;
 import com.checklist.model.TaskSearchFilter;
@@ -49,10 +51,24 @@ public interface TaskDAO {
     List<Task> getTask(TaskSearchFilter taskSearchFilter, int userId);
 
     /**
-     * Retrieves the task history for the specified user.
+     * Retrieves the paginated task history for a specific user.
      *
-     * @param userId the ID of the user whose task history is to be retrieved
-     * @return a list of {@link TaskHistory} objects representing the user's task history
+     * This method fetches task history records for the user with the given ID, 
+     * applying pagination parameters such as page number and page size. The 
+     * result includes a list of task history records and the total count of 
+     * records available.
+     *
+     * The task history is fetched from a database view (`TASK_HISTORY_VIEW`) and 
+     * ordered by the task's creation date in descending order. The pagination 
+     * is achieved using SQL's `LIMIT` and `OFFSET` clauses based on the page 
+     * request.
+     *
+     * @param userId the ID of the user for whom the task history is to be retrieved
+     * @param pr the page request containing pagination parameters such as page number and page size
+     * @return a {@link PageResponse} object containing a list of {@link TaskHistory} and the total count of records
+     * 
+     * @throws SQLException if a database access error occurs
+     * @throws NumberFormatException if the pagination parameters are invalid
      */
-    List<TaskHistory> getTaskHistory(int userId);
+    PageResponse<List<TaskHistory>> getTaskHistory(int userId, PageRequest pr);
 }

@@ -6,10 +6,14 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.checklist.DAO.TaskDAO;
 import com.checklist.database.DBConnect;
+import com.checklist.model.PageRequest;
+import com.checklist.model.PageResponse;
 import com.checklist.model.Task;
 import com.checklist.model.TaskHistory;
 import com.checklist.model.TaskSearchFilter;
@@ -21,18 +25,17 @@ import lombok.AllArgsConstructor;
  * data in the database. This class handles CRUD operations on tasks, task history, 
  * and task status updates.
  */
-@AllArgsConstructor
 @Component
 public class TaskDAOImpl implements TaskDAO {
+	
+	@Value("${defaultPageSize:10}")
+	private Integer defaultPageSize;
 
+	@Autowired
     private DBConnect dbConnect;
 
     /**
-     * Retrieves the tasks for the home page for the given user.
-     * The tasks fetched are those created by the user on the current day.
-     *
-     * @param userId the ID of the user whose tasks are to be retrieved
-     * @return a list of {@link Task} objects representing the user's tasks for today
+     * {@inheritDoc}
      */
     @Override
     public List<Task> getHomeTask(int userId) {
@@ -61,11 +64,7 @@ public class TaskDAOImpl implements TaskDAO {
     }
 
     /**
-     * Updates the status of the task with the given ID.
-     *
-     * @param id the ID of the task to be updated
-     * @param status the new status of the task (true for complete, false for incomplete)
-     * @return true if the update was successful, false otherwise
+     * {@inheritDoc}
      */
     @Override
     public boolean updateStatus(int id, boolean status) {
@@ -88,11 +87,7 @@ public class TaskDAOImpl implements TaskDAO {
     }
 
     /**
-     * Adds a new task created by the specified user.
-     *
-     * @param createdBy the ID of the user creating the task
-     * @param task the {@link Task} object containing task details
-     * @return true if the task was successfully added, false otherwise
+     * {@inheritDoc}
      */
     @Override
     public boolean addTask(int createdBy, Task task) {
@@ -115,11 +110,7 @@ public class TaskDAOImpl implements TaskDAO {
     }
 
     /**
-     * Retrieves tasks based on the specified filter criteria and user ID.
-     *
-     * @param tsf the {@link TaskSearchFilter} object containing filter criteria
-     * @param userId the ID of the user whose tasks are to be retrieved
-     * @return a list of {@link Task} objects that match the filter criteria
+     * {@inheritDoc}
      */
     @Override
     public List<Task> getTask(TaskSearchFilter tsf, int userId) {
@@ -172,34 +163,42 @@ public class TaskDAOImpl implements TaskDAO {
     }
 
     /**
-     * Retrieves the task history for the given user.
-     *
-     * @param userId the ID of the user whose task history is to be retrieved
-     * @return a list of {@link TaskHistory} objects representing the user's task history
+     * {@inheritDoc}
      */
     @Override
-    public List<TaskHistory> getTaskHistory(int userId) {
-        List<TaskHistory> th = new ArrayList<>();
+    public PageResponse<List<TaskHistory>>getTaskHistory(int userId, PageRequest pr) {
+        PageResponse<List<TaskHistory>> prth = new PageResponse<>();
         try {
             Connection conn = dbConnect.getConn();
+            
+            StringBuilder sb = new StringBuilder("SELECT thv.*, COUNT(1) OVER() TOTAL_COUNT FROM TASK_HISTORY_VIEW thv WHERE CREATED_BY = ? ORDER BY CREATED_DATE DESC LIMIT ? OFFSET ?");
 
-            String sql = "SELECT * FROM TASK_HISTORY_VIEW WHERE CREATED_BY = ? ORDER BY CREATED_DATE DESC";
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setInt(1, userId);
-            ResultSet result = ps.executeQuery();
+			// page 1 limit 10, offset 0
+			// page 2 limit 10, offset 10
+			// page 3 limit 10, offset 20
+			// page 4 limit 10, offset 30
 
-            while (result.next()) {
-                th.add(TaskHistory.builder()
-                        .createdDate(result.getDate("created_date"))
-                        .completed(result.getInt("completed"))
-                        .totalRecords(result.getInt("total_records"))
-                        .build());
+			int limit = pr.getPageSize() != null && pr.getPageSize() > 0 ? pr.getPageSize() : this.defaultPageSize;
+			int offset = pr.getPageNo() != null && pr.getPageNo() > 1 ? (pr.getPageNo() - 1) * limit : 0;
 
-            }
+			PreparedStatement ps = conn.prepareStatement(sb.toString());
+			ps.setInt(1, userId);
+			ps.setInt(2, limit);
+			ps.setInt(3, offset);
 
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return th;
+			ResultSet result = ps.executeQuery();
+			int totalCount = 0;
+			List<TaskHistory> th = new ArrayList<>();
+			while (result.next()) {
+				th.add(TaskHistory.builder().createdDate(result.getDate("created_date"))
+						.completed(result.getInt("completed")).totalTasks(result.getInt("total_tasks")).build());
+				totalCount = result.getInt("TOTAL_COUNT");
+			}
+			prth.setData(th);
+			prth.setTotalCount(totalCount);					
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return prth;
     }
 }
