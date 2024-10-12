@@ -19,5 +19,5 @@ import lombok.NoArgsConstructor;
 public class TaskHistory {
     private Date createdDate;     // The date when the task history record was created
     private int completed;         // The number of tasks completed on the created date
-    private int totalRecords;      // The total number of tasks for the created date
+    private int totalTasks;      // The total number of tasks for the created date
 }

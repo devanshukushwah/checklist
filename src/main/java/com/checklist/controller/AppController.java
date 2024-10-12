@@ -13,8 +13,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.checklist.model.PageRequest;
+import com.checklist.model.PageResponse;
 import com.checklist.model.Task;
 import com.checklist.model.TaskHistory;
 import com.checklist.model.TaskSearchFilter;
@@ -121,17 +124,36 @@ public class AppController {
     }
 
     /**
-     * Displays the task history for the logged-in user.
+     * Displays the task history for the logged-in user, with pagination support.
      *
-     * @param md the model to pass attributes to the view
+     * Retrieves the task history based on the logged-in user's ID and pagination 
+     * parameters (page number and page size). The task history is then passed 
+     * to the view to be displayed.
+     *
+     * @param md the model used to pass attributes to the view
      * @param session the current HTTP session to retrieve the logged-in user
-     * @return the name of the JSP page to render the task history view
+     * @param pageNo the current page number for pagination, defaults to 1 if not provided
+     * @param pageSize the number of records per page for pagination, defaults to 10 if not provided
+     * @return the name of the JSP page to render the task history view ("history")
      */
-    @GetMapping("/history")
-    public String getHistory(Model md, HttpSession session) {
-        User user = (User) session.getAttribute("user");
-        List<TaskHistory> th = taskService.getTaskHistory(user.getId());
-        md.addAttribute("taskHistory", th);
-        return "history";
-    }
+	@GetMapping("/history")
+	public String getHistory(Model md, HttpSession session,
+			@RequestParam(value = "pageNo", defaultValue = "1", required = false) String pageNo,
+			@RequestParam(value = "pageSize", defaultValue = "10", required = false) String pageSize) {
+		User user = (User) session.getAttribute("user");
+		int iPageNo = Integer.parseInt(pageNo);
+		int iPageSize = Integer.parseInt(pageSize);
+
+		PageRequest pageRequest = PageRequest.builder().pageNo(iPageNo).pageSize(iPageSize).build();
+		PageResponse<List<TaskHistory>> prth = taskService.getTaskHistory(user.getId(), pageRequest);
+		md.addAttribute("pageNo", iPageNo);
+		md.addAttribute("pageSize", iPageSize);
+		md.addAttribute("totalCount", prth.getTotalCount());
+		md.addAttribute("taskHistory", prth.getData());
+
+		int totalPages = (int) Math.ceil((double) prth.getTotalCount() / iPageSize);
+
+		md.addAttribute("totalPages", totalPages);
+		return "history";
+	}
 }
